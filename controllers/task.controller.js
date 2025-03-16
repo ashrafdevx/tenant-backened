@@ -150,9 +150,7 @@ export const completeTask = async (req, res) => {
 // @access Private (Requires authentication)
 export const getTaskById = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id)
-      .populate("assignee", "name email")
-      .populate("dependencies", "title status");
+    const task = await Task.findById(req.params.id);
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
