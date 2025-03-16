@@ -9,7 +9,6 @@ const io = setupWebSocket;
 export const addDependency = async (req, res) => {
   const { dependent_task_id } = req.body;
   const task_id = req.params.id;
-
   try {
     const task = await Task.findById(task_id);
     const dependentTask = await Task.findById(dependent_task_id);

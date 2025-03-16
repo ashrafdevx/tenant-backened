@@ -5,6 +5,7 @@ import {
   updateTask,
   deleteTask,
   getTaskById,
+  checkCircularDependencies,
 } from "../controllers/task.controller.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { body } from "express-validator";
@@ -32,5 +33,5 @@ taskRouter.put("/:id", protect, updateTask);
 // Delete Task (Admin Only)
 taskRouter.delete("/:id", protect, deleteTask);
 taskRouter.get("/:id", protect, getTaskById);
-
+taskRouter.post("/:id/check-dependencies", protect, checkCircularDependencies);
 export default taskRouter;
