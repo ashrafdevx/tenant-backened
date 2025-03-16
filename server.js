@@ -14,7 +14,14 @@ const app = express();
 const server = http.createServer(app); // Create HTTP Server
 const io = setupWebSocket(server); // Initialize WebSocket
 app.use(express.json());
-app.use(cors());
+// CORS Configuration
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://tenant-backened.vercel.app"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 connectDB(); // Connect to MongoDB
 

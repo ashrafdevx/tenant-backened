@@ -90,17 +90,10 @@ export const updateTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Ensure dependencies exist before updating
-    if (dependencies) {
-      const validDependencies = await Task.find({
-        _id: { $in: dependencies },
-      });
-
-      if (validDependencies.length !== dependencies.length) {
-        return res
-          .status(400)
-          .json({ message: "One or more dependencies are invalid" });
-      }
+    // Ensure status is valid before updating
+    const validStatuses = ["pending", "in-progress", "completed"];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
     }
 
     // Update task details
