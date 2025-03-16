@@ -18,7 +18,9 @@ app.use(cors());
 
 connectDB(); // Connect to MongoDB
 
-// Routes
+app.get("/test", (req, res) => {
+  res.send("Done Deployment");
+});
 app.use("/api/auth", authRoutes); // Authentication Routes
 app.use("/api/tasks", taskRouter); // Register Task Routes
 app.use("/api/tasks", depandencyRouter); // Register Dependency Routes
