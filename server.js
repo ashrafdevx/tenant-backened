@@ -18,6 +18,12 @@ app.use(cors());
 
 connectDB(); // Connect to MongoDB
 
+// Cache Routes
+app.use((req, res, next) => {
+  res.set("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
+  next();
+});
+
 app.get("/test", (req, res) => {
   res.send("Done");
 });

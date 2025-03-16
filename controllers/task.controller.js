@@ -144,3 +144,23 @@ export const completeTask = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// @desc   Get task by ID
+// @route  GET /api/tasks/:id
+// @access Private (Requires authentication)
+export const getTaskById = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id)
+      .populate("assignee", "name email")
+      .populate("dependencies", "title status");
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json(task);
+  } catch (error) {
+    console.error("Error fetching task:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
