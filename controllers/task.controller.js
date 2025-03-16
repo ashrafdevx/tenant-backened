@@ -56,23 +56,62 @@ export const getTasks = async (req, res) => {
 // @desc   Update a task
 // @route  PUT /api/tasks/:id
 // @access Admin, Manager, Assignee
+// export const updateTask = async (req, res) => {
+//   try {
+//     const task = await Task.findById(req.params.id);
+
+//     if (!task) return res.status(404).json({ message: "Task not found" });
+
+//     // Check Tenant Isolation
+//     if (task.tenant_id.toString() !== req.user.tenant_id.toString()) {
+//       return res.status(403).json({ message: "Access Denied" });
+//     }
+
+//     Object.assign(task, req.body);
+//     await task.save();
+
+//     // Access WebSocket instance from the request
+//     const io = req.app.get("io");
+//     io.emit("taskUpdated", task);
+
+//     res.json(task);
+//   } catch (error) {
+//     console.error("Error updating task:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 export const updateTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const { title, description, status, dueDate, assignee, dependencies } =
+      req.body;
 
-    if (!task) return res.status(404).json({ message: "Task not found" });
-
-    // Check Tenant Isolation
-    if (task.tenant_id.toString() !== req.user.tenant_id.toString()) {
-      return res.status(403).json({ message: "Access Denied" });
+    let task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
     }
 
-    Object.assign(task, req.body);
-    await task.save();
+    // Ensure dependencies exist before updating
+    if (dependencies) {
+      const validDependencies = await Task.find({
+        _id: { $in: dependencies },
+      });
 
-    // Access WebSocket instance from the request
-    const io = req.app.get("io");
-    io.emit("taskUpdated", task);
+      if (validDependencies.length !== dependencies.length) {
+        return res
+          .status(400)
+          .json({ message: "One or more dependencies are invalid" });
+      }
+    }
+
+    // Update task details
+    task.title = title || task.title;
+    task.description = description || task.description;
+    task.status = status || task.status;
+    task.dueDate = dueDate || task.dueDate;
+    task.assignee = assignee || task.assignee;
+    task.dependencies = dependencies || task.dependencies;
+
+    await task.save();
 
     res.json(task);
   } catch (error) {

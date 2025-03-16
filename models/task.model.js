@@ -20,6 +20,12 @@ const TaskSchema = new mongoose.Schema(
       ref: "Tenant",
       required: true,
     }, // Multi-Tenant Isolation
+    dependencies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Task", // Reference to other tasks
+      },
+    ],
   },
   { timestamps: true }
 );
