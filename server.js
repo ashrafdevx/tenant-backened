@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import taskRouter from "./routes/task.routes.js";
 import depandencyRouter from "./routes/depandency.routes.js";
 import setupWebSocket from "./websocket/index.js";
+import tenentrouter from "./routes/tenant.routes.js";
 
 dotenv.config(); // ✅ Load .env correctly
 
@@ -37,7 +38,7 @@ app.get("/test", (req, res) => {
 app.use("/api/auth", authRoutes); // Authentication Routes
 app.use("/api/tasks", taskRouter); // Register Task Routes
 app.use("/api/depandency", depandencyRouter); // Register Dependency Routes
-
+app.use("/api/tenants", tenentrouter);
 // Attach io to request object so controllers can access it
 app.set("io", io);
 const PORT = process.env.PORT || 5000;

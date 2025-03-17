@@ -42,10 +42,7 @@ export const createTask = async (req, res) => {
 // @access All Roles
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ tenant_id: req.user.tenant_id }).populate(
-      "assignee",
-      "name email"
-    );
+    const tasks = await Task.find({ tenant_id: req.user.tenant_id });
     res.json(tasks);
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -224,17 +221,16 @@ export const completeTask = async (req, res) => {
     await task.save();
 
     // Find tasks that depend on this task
-    const dependentTasks = await Dependency.find({
-      dependent_task_id: task._id,
+    const dependentTasks = await Task.find({
+      dependencies: task._id,
+      tenant_id: req.user.tenant_id, // Ensure tenant isolation
     });
 
-    // Notify all dependencies that this task is completed
-    for (const dep of dependentTasks) {
-      io.emit("dependencyCompleted", {
-        taskId: dep.task_id,
-        completedTask: task,
-      });
-    }
+    // Notify all dependent tasks that this task is completed
+    io.to(req.user.tenant_id.toString()).emit("dependencyCompleted", {
+      taskId: task._id,
+      dependentTasks: dependentTasks.map((t) => t._id),
+    });
 
     res.json({ message: "Task marked as completed", task });
   } catch (error) {
@@ -242,6 +238,43 @@ export const completeTask = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// export const completeTask = async (req, res) => {
+//   try {
+//     const task = await Task.findById(req.params.id);
+
+//     if (!task) return res.status(404).json({ message: "Task not found" });
+
+//     // Ensure user has permission to complete the task
+//     if (
+//       req.user.role !== "admin" &&
+//       req.user.role !== "manager" &&
+//       task.assignee.toString() !== req.user._id.toString()
+//     ) {
+//       return res.status(403).json({ message: "Access Denied" });
+//     }
+
+//     task.status = "completed";
+//     await task.save();
+
+//     // Find tasks that depend on this task
+//     const dependentTasks = await Dependency.find({
+//       dependent_task_id: task._id,
+//     });
+
+//     // Notify all dependencies that this task is completed
+//     for (const dep of dependentTasks) {
+//       io.emit("dependencyCompleted", {
+//         taskId: dep.task_id,
+//         completedTask: task,
+//       });
+//     }
+
+//     res.json({ message: "Task marked as completed", task });
+//   } catch (error) {
+//     console.error("Error completing task:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 // @desc   Get task by ID
 // @route  GET /api/tasks/:id
