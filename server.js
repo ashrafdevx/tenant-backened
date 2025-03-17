@@ -17,7 +17,7 @@ const io = setupWebSocket(server); // Initialize WebSocket
 app.use(express.json());
 // CORS Configuration
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://tenant-backened.vercel.app"],
+  origin: ["http://localhost:3000", "https://tenant-frontend-eight.vercel.app"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
