@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema(
     tenant_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tenant",
-      required: true,
+      // required: true,
     }, // Multi-tenant isolation
   },
   { timestamps: true }
